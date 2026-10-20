@@ -23,6 +23,23 @@ leur implémentation technique.
 
 Une adresse e-mail ne peut être associée qu'à un seul compte utilisateur.
 
+Informations obligatoires
+→ nom d'affichage
+→ e-mail
+→ mot de passe
+
+Vérification de l'adresse e-mail
+→ NON pour le premier MVP
+
+Connexion automatique après inscription
+→ NON
+→ redirection vers la connexion
+
+Mot de passe
+→ minimum 8 caractères
+→ pas de règles artificielles du genre
+"obligatoirement une majuscule + chiffre + symbole"
+
 ---
 
 ## BR-002 — Authentification
@@ -156,3 +173,33 @@ Un utilisateur ne peut être membre qu'une seule fois d'un même projet.
 Le couple suivant doit être unique :
 
 project + user
+
+## BR-049 — Informations nécessaires à l'inscription
+
+La création d'un compte nécessite :
+
+- un nom d'affichage ;
+- une adresse e-mail valide ;
+- un mot de passe.
+
+---
+
+## BR-050 — Mot de passe
+
+Un mot de passe doit comporter au minimum 8 caractères.
+
+Le mot de passe ne doit jamais être stocké en clair.
+
+---
+
+## BR-051 — Vérification de l'adresse e-mail
+
+La vérification de l'adresse e-mail n'est pas requise dans le MVP.
+
+---
+
+## BR-052 — Connexion après inscription
+
+La création d'un compte n'authentifie pas automatiquement l'utilisateur.
+
+Après son inscription, l'utilisateur doit se connecter.

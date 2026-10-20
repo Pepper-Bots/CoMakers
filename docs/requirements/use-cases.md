@@ -147,3 +147,149 @@ L'utilisateur invité n'est pas encore membre du projet.
 - BR-013 — Gestion des invitations
 - BR-016 — Unicité de l'appartenance
 - BR-017 — Invitation d'un membre existant
+
+---
+---
+
+# USE-CASE Détails
+
+## UC-01 — Créer un compte
+
+### Objectif
+
+Permettre à une personne de créer un compte CoMakers afin d'accéder
+aux fonctionnalités collaboratives de la plateforme.
+
+### Acteur principal
+
+Visiteur non authentifié.
+
+### Préconditions
+
+- L'utilisateur ne possède pas déjà un compte associé à l'adresse e-mail saisie.
+
+### Scénario nominal
+
+1. Le visiteur demande à créer un compte.
+2. Le système affiche le formulaire d'inscription.
+3. Le visiteur renseigne :
+    - son nom d'affichage ;
+    - son adresse e-mail ;
+    - son mot de passe.
+4. Le visiteur valide son inscription.
+5. Le système vérifie la validité des données.
+6. Le système vérifie que l'adresse e-mail n'est pas déjà utilisée.
+7. Le système sécurise le mot de passe avant son stockage.
+8. Le système crée le compte utilisateur.
+9. Le système confirme la création du compte.
+
+### Scénarios alternatifs
+
+#### Adresse e-mail déjà utilisée
+
+L'adresse e-mail correspond déjà à un compte CoMakers.
+
+Le compte n'est pas créé et le système informe l'utilisateur que
+cette adresse ne peut pas être utilisée pour une nouvelle inscription.
+
+#### Adresse e-mail invalide
+
+L'adresse e-mail ne respecte pas le format attendu.
+
+Le compte n'est pas créé et l'utilisateur est invité à corriger
+son adresse.
+
+#### Mot de passe invalide
+
+Le mot de passe ne respecte pas les exigences définies par CoMakers.
+
+Le compte n'est pas créé et l'utilisateur est informé des exigences
+à respecter.
+
+#### Données obligatoires manquantes
+
+Une ou plusieurs informations obligatoires ne sont pas renseignées.
+
+Le compte n'est pas créé et les champs concernés sont signalés.
+
+### Postconditions
+
+- Un nouvel utilisateur est enregistré dans CoMakers.
+- L'adresse e-mail est associée à un seul compte.
+- Le mot de passe n'est jamais stocké en clair.
+- L'utilisateur peut utiliser son compte pour s'authentifier.
+
+### Règles métier associées
+
+- BR-001 — Unicité du compte
+
+## UC-05 — Créer un projet
+
+### Objectif
+
+Permettre à un utilisateur authentifié de créer un nouvel espace de
+collaboration pour un projet créatif.
+
+### Acteur principal
+
+Utilisateur authentifié.
+
+### Préconditions
+
+- L'utilisateur possède un compte CoMakers.
+- L'utilisateur est authentifié.
+
+### Scénario nominal
+
+1. L'utilisateur demande à créer un nouveau projet.
+2. Le système affiche le formulaire de création.
+3. L'utilisateur renseigne :
+    - le nom du projet ;
+    - éventuellement une description.
+4. L'utilisateur valide la création.
+5. Le système vérifie la validité des données.
+6. Le système crée le projet avec le statut `ACTIVE`.
+7. Le système définit l'utilisateur comme propriétaire (`OWNER`).
+8. Le système ajoute automatiquement le propriétaire comme membre du projet.
+9. Le projet est créé comme projet privé.
+10. Le système confirme la création du projet.
+11. L'utilisateur peut accéder au nouvel espace projet.
+
+### Scénarios alternatifs
+
+#### Nom du projet absent
+
+Le nom du projet n'est pas renseigné.
+
+Le projet n'est pas créé et le système indique que le nom est obligatoire.
+
+#### Nom du projet invalide
+
+Le nom ne respecte pas les contraintes définies par CoMakers.
+
+Le projet n'est pas créé et l'utilisateur est invité à corriger le nom.
+
+#### Utilisateur non authentifié
+
+Un utilisateur non authentifié tente de créer un projet.
+
+La création est refusée.
+
+### Postconditions
+
+- Un nouveau projet `ACTIVE` existe.
+- Le projet est privé.
+- L'utilisateur ayant créé le projet en est le propriétaire.
+- Une appartenance au projet existe pour le propriétaire.
+- Le propriétaire possède la permission `OWNER`.
+- Le projet peut désormais recevoir des membres, contributions, tâches et fichiers.
+
+### Règles métier associées
+
+- BR-002 — Authentification
+- BR-004 — Création d'un projet
+- BR-005 — Propriété du projet
+- BR-006 — Propriétaire obligatoire
+- BR-007 — Appartenance automatique du propriétaire
+- BR-008 — États d'un projet
+- BR-010 — Accès à un projet

@@ -13,7 +13,7 @@ d'un livre pour enfants.
 
 ---
 
-### Ce document vise à répondre aux question suivantes :
+### Ce document vise à répondre aux questions suivantes :
 
 → Qu'est-ce qu'on construit EXACTEMENT maintenant ?
 
