@@ -2,6 +2,9 @@ package io.github.pepperbots.comakers.user;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 @Service
 public class UserService {
@@ -16,16 +19,27 @@ public class UserService {
     }
 
     public User register(String displayName, String email, String password) {
-
+        if (password.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new IllegalArgumentException("Password exceeds BCrypt byte limit");
+        }
+        email = email.strip().toLowerCase(Locale.ROOT);
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Cette adresse email est déjà utilisée.");
+            throw new EmailAlreadyUsedException();
         }
 
         User user = new User();
-        user.setDisplayName(displayName);
+        user.setDisplayName(displayName.strip());
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(password));
 
-        return userRepository.save(user);
+        try {
+            return userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException exception) {
+            // The unique database constraint also protects concurrent registrations.
+            if (userRepository.existsByEmail(email)) {
+                throw new EmailAlreadyUsedException();
+            }
+            throw exception;
+        }
     }
 }
