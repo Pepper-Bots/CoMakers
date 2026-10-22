@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest {
     @Autowired MockMvc mvc;
     @MockitoBean UserService service;
+    @MockitoBean org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder;
 
     @Test
     void registersWithoutAuthenticationAndDoesNotExposePasswordOrCreateSession() throws Exception {
@@ -68,6 +69,6 @@ class UserControllerTest {
 
     @Test
     void otherEndpointsRemainClosed() throws Exception {
-        mvc.perform(get("/api/users")).andExpect(status().isForbidden());
+        mvc.perform(get("/api/users")).andExpect(status().isUnauthorized());
     }
 }
