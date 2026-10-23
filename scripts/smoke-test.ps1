@@ -4,6 +4,7 @@ $BaseUrl = $BaseUrl.TrimEnd('/')
 function Invoke-Expected {
     param([string]$Method, [string]$Path, [int]$Expected, [object]$Body = $null, [hashtable]$Headers = @{})
     $params = @{ Uri = "$BaseUrl$Path"; Method = $Method; Headers = $Headers; UseBasicParsing = $true }
+    if (-not $Headers.ContainsKey('Accept')) { $Headers['Accept'] = 'application/json' }
     if ($null -ne $Body) {
         $params.ContentType = 'application/json'
         $params.Body = $Body | ConvertTo-Json -Compress
@@ -12,7 +13,12 @@ function Invoke-Expected {
     try {
         $response = Invoke-WebRequest @params
         $status = [int]$response.StatusCode
-        $content = $response.Content
+        # PowerShell 7 can expose vendor JSON media types as raw bytes.
+        $content = if ($response.Content -is [byte[]]) {
+            [System.Text.Encoding]::UTF8.GetString($response.Content)
+        } else {
+            [string]$response.Content
+        }
     } catch {
         if ($null -eq $_.Exception.Response) { throw "Cannot reach $BaseUrl. Start the API first." }
         $status = [int]$_.Exception.Response.StatusCode
