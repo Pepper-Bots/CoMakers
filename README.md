@@ -1,335 +1,117 @@
 # CoMakers
 
-> Plateforme collaborative permettant de créer, organiser et développer des projets créatifs à plusieurs.
+CoMakers aide des personnes qui se connaissent déjà à réaliser un projet créatif
+ensemble. Le premier cas concret est la création à distance d'un livre pour
+enfants : réunir les contributions, les échanges, les tâches et les fichiers.
 
-## À propos
+**État au 23 octobre 2026 : API d'inscription, connexion JWT et consultation du
+profil disponibles.** Il n'y a pas encore de frontend ni de gestion des projets.
+Le MVP complet n'est donc pas terminé.
 
-Ce projet a pour objectif de faciliter la collaboration entre des personnes souhaitant développer ensemble des projets créatifs.
+## Je rejoins le projet
 
-L'application doit permettre à terme de passer d'une idée à un projet concret en réunissant :
+1. Lire [le périmètre et l'état réel](docs/requirements/mvp-v0.md).
+2. Suivre [le guide de démarrage local](docs/onboarding.md).
+3. Tester [les trois routes de l'API](docs/api/authentication.md).
+4. Lire [l'architecture actuelle](docs/architecture/README.md).
+5. Suivre [les règles de contribution](CONTRIBUTING.md) pour sa première PR.
 
-* des porteurs de projets ;
-* des créateurs ;
-* des collaborateurs disposant de compétences complémentaires ;
-* des collectifs déjà constitués.
+Aucun compte AWS, accès à la base d'Hélène, secret partagé ni donnée privée n'est
+nécessaire pour travailler localement. Chaque personne possède sa propre base et
+ses propres secrets. Pour pousser une branche sur ce dépôt, demander à Hélène
+l'accès collaborateur GitHub ; le clonage du dépôt public et le travail local
+n'exigent pas cet accès.
 
-La plateforme combinera progressivement **gestion de projet**, **collaboration** et **mise en relation**.
+## Démarrage court avec Docker
 
----
-
-## Premier cas d'usage
-
-Le développement est guidé par un premier projet réel : la création collaborative à distance d'un **livre pour enfants**.
-
-Ce cas d'usage permettra de tester les fonctionnalités avec de vrais utilisateurs dès les premières versions et d'orienter le développement selon les besoins réellement rencontrés.
-
----
-
-## Objectif du MVP
-
-La première version doit permettre à plusieurs utilisateurs de gérer ensemble un projet créatif.
-
-### Fonctionnalités principales
-
-* Création et authentification d'un compte
-* Création d'un projet
-* Modification d'un projet
-* Invitation de collaborateurs
-* Gestion des membres d'un projet
-* Attribution de rôles
-* Création de contributions
-* Commentaires sur les contributions
-* Création et attribution de tâches
-* Suivi de l'avancement des tâches
-* Dépôt et consultation de fichiers
-
-Les fonctionnalités de réseau social, de recherche publique de collaborateurs et de gestion juridique avancée seront développées ultérieurement.
-
----
-
-## Vision à long terme
-
-La plateforme devra permettre trois grands usages :
-
-### Créer
-
-Donner une structure à une idée et disposer d'un espace permettant de la transformer en projet.
-
-### Collaborer
-
-Centraliser les contributions, fichiers, tâches, décisions et échanges nécessaires à la réalisation du projet.
-
-### Rencontrer
-
-Permettre aux porteurs de projets de trouver des collaborateurs et aux créateurs de découvrir des projets correspondant à leurs compétences et leurs envies.
-
----
-
-## Stack technique
-
-### Backend
-
-* Java
-* Spring Boot
-* Spring Web
-* Spring Data JPA
-* Spring Security
-* Maven
-* API REST
-
-### Base de données
-
-* PostgreSQL
-
-### Frontend
-
-À définir.
-
-Option actuellement envisagée :
-
-* Angular
-
-### Infrastructure
-
-* Docker
-* AWS
-
-Services AWS envisagés à terme :
-
-* Amazon RDS — PostgreSQL
-* Amazon S3 — stockage des fichiers
-* CloudFront / S3 — frontend
-* Hébergement du backend AWS à définir
-
-L'infrastructure cloud définitive sera mise en place après validation du prototype local.
-
----
-
-## Architecture
-
-Le MVP reposera sur une architecture **monolithique modulaire**.
-
-Organisation fonctionnelle envisagée :
+Prérequis : Git, Docker avec moteur Linux démarré et Compose v2. Windows :
+Docker Desktop avec WSL2 ; macOS : Docker Desktop ; Linux : Docker Engine et
+plugin Compose. Internet est nécessaire au premier téléchargement des images.
 
 ```text
-backend/
-├── authentication/
-├── users/
-├── projects/
-├── members/
-├── contributions/
-├── tasks/
-├── files/
-└── common/
+git clone https://github.com/Pepper-Bots/CoMakers.git
+cd CoMakers
 ```
 
-L'objectif est de conserver une architecture simple tout en isolant correctement les différents domaines métier.
+Générer les secrets locaux (une seule fois) :
 
-Une architecture microservices n'est pas envisagée pour le MVP.
+- Windows PowerShell : `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/init-env.ps1`
+- macOS/Linux avec OpenSSL : `sh scripts/init-env.sh`
 
----
-
-## Structure du repository
-
-Structure envisagée :
+Puis, depuis la racine du dépôt :
 
 ```text
-/
-├── backend/
-├── frontend/
-├── docs/
-├── .gitignore
-└── README.md
+docker compose up -d --build --wait --wait-timeout 240
 ```
 
-Le frontend sera ajouté une fois la technologie définitivement choisie.
+API : http://localhost:8081 ; état de santé :
+http://localhost:8081/actuator/health (réponse attendue : `{"status":"UP"}`).
 
----
+MySQL Docker est accessible sur `127.0.0.1:3307`. Ces ports évitent les ports
+habituels de MySQL local (3306) et d'IntelliJ (8080). Aucun compte applicatif
+n'est précréé : commencer par l'inscription.
 
-## Organisation du développement
+Pour développer dans IntelliJ ou sans Docker, voir les
+[deux parcours détaillés](docs/onboarding.md). La configuration existante sur
+3306/8080 reste compatible.
 
-Le projet est développé de manière itérative à partir d'un backlog.
+## Stack effective
 
-Le suivi sera réalisé avec :
+| Élément | Choix actuel |
+|---|---|
+| Langage | Java 21 |
+| Backend | Spring Boot 3.5.6, Spring Web, JPA, Validation, Security |
+| Base | MySQL ; environnement portable basé sur MySQL 8.4 |
+| Build | Maven 3.9.11 fourni par le Wrapper |
+| Authentification | BCrypt + JWT HS256, durée 15 minutes |
+| Frontend | Absent, choix à confirmer (Angular envisagé) |
+| Cloud | Aucun requis localement ; AWS reste une piste future |
 
-* GitHub Issues
-* GitHub Projects
-* Pull Requests
-* sprints courts
+[Décisions techniques et limites](docs/decisions/001-local-development.md).
 
-### Workflow
+## Ce qui fonctionne et ce qui reste à faire
+
+- Réalisé : inscription, validation des données, gestion des doublons, connexion,
+  profil authentifié, refus des jetons invalides/expirés.
+- Prochaine étape : création et consultation de projets privés, propriétaire
+  automatiquement membre.
+- Ensuite : invitations, contributions, commentaires, tâches, fichiers et interface.
+- Hors MVP : recherche publique de collaborateurs, réseau social, contrats et IA.
+
+Les documents fonctionnels décrivent une **cible**, pas une liste de fonctions
+déjà livrées. Le [catalogue UC](docs/requirements/use-cases.md) fixe les identifiants
+des cas d'usage. Le [périmètre V0](docs/requirements/mvp-v0.md) fixe l'ordre actuel.
+Les [règles métier](docs/requirements/business-rules.md) précisent les comportements.
+
+## Tests et outils
+
+Dans `backend` : `./mvnw verify` (macOS/Linux) ou `.\mvnw.cmd verify`
+(PowerShell). Seul Java 21 est nécessaire ; ni MySQL ni JWT_SECRET ne sont requis
+pour les tests automatisés actuels, qui simulent les repositories.
+
+La collection [Postman](backend/postman/CoMakers-auth.postman_collection.json)
+couvre inscription, connexion, profil, doublon et erreurs.
+Le [smoke test](scripts/smoke-test.ps1) vérifie le même parcours sur une API
+démarrée et crée un compte de test distinct à chaque exécution.
+
+GitHub Actions exécute les tests sur Windows et Linux et vérifie la stack Docker.
+Consulter le résultat de la PR : un workflow ajouté n'est pas une preuve de succès
+tant que son exécution n'est pas terminée.
+
+## Organisation du dépôt
 
 ```text
-Backlog
-   ↓
-Ready
-   ↓
-In progress
-   ↓
-Review / Test
-   ↓
-Done
+backend/                 application Java, tests, Wrapper, Dockerfile, collection Postman
+docs/requirements/       besoins et périmètre produit
+docs/architecture/       architecture actuelle et modèle métier cible
+docs/api/                contrat des routes disponibles
+docs/decisions/          choix techniques et points encore ouverts
+scripts/                 génération des secrets et vérification API réelle
+compose.yaml             MySQL + API isolés pour le développement
+CONTRIBUTING.md          branches, PR, tests et coordination
 ```
 
-Chaque sprint doit répondre à un objectif fonctionnel identifiable.
-
----
-
-## Git workflow
-
-Branche principale :
-
-```text
-main
-```
-
-Branches de développement :
-
-```text
-feature/<nom-feature>
-fix/<nom-fix>
-chore/<nom-tache>
-```
-
-Exemples :
-
-```text
-feature/project-creation
-feature/user-authentication
-feature/project-members
-fix/project-access-control
-chore/docker-postgres
-```
-
-Les évolutions significatives sont intégrées à `main` via Pull Request.
-
----
-
-## Roadmap
-
-### Phase 0 — Initialisation
-
-* [ ] Initialiser le repository
-* [ ] Ajouter le README
-* [ ] Ajouter le `.gitignore`
-* [ ] Initialiser Spring Boot
-* [ ] Configurer PostgreSQL
-* [ ] Configurer Docker
-* [ ] Créer le GitHub Project
-* [ ] Constituer le backlog initial
-
-### Phase 1 — Utilisateurs
-
-* [ ] Modèle utilisateur
-* [ ] Création de compte
-* [ ] Authentification
-* [ ] Autorisation
-* [ ] Profil minimal
-
-### Phase 2 — Projets
-
-* [ ] Création d'un projet
-* [ ] Consultation d'un projet
-* [ ] Modification d'un projet
-* [ ] Suppression d'un projet
-* [ ] Gestion du propriétaire
-
-### Phase 3 — Collaboration
-
-* [ ] Invitations
-* [ ] Membres
-* [ ] Rôles
-* [ ] Contrôle d'accès
-
-### Phase 4 — Contributions
-
-* [ ] Création d'une contribution
-* [ ] Consultation
-* [ ] Modification
-* [ ] Commentaires
-
-### Phase 5 — Organisation
-
-* [ ] Création de tâches
-* [ ] Attribution
-* [ ] Statuts
-* [ ] Priorités
-* [ ] Échéances
-
-### Phase 6 — Fichiers
-
-* [ ] Upload
-* [ ] Téléchargement
-* [ ] Association à un projet
-* [ ] Association à une contribution
-
-### Phase 7 — MVP
-
-Utilisation de l'application sur un premier projet créatif réel et collecte des retours utilisateurs.
-
----
-
-## Fonctionnalités envisagées après le MVP
-
-* Profils créatifs
-* Portfolio
-* Recherche de collaborateurs
-* Projets publics
-* Appels à collaboration
-* Système de candidatures
-* Votes
-* Notifications
-* Calendrier collaboratif
-* Gestion des disponibilités
-* Versionnement des contributions
-* Messagerie
-* Gestion des droits et accords entre collaborateurs
-* Modèles de contrats
-* Fonctionnalités d'assistance basées sur l'IA
-
----
-
-## Sécurité
-
-La sécurité doit être intégrée dès la conception.
-
-Principes initiaux :
-
-* mots de passe hashés ;
-* authentification sécurisée ;
-* gestion stricte des autorisations ;
-* contrôle d'accès aux projets privés ;
-* validation des données entrantes ;
-* secrets exclus du repository ;
-* séparation des environnements ;
-* principe du moindre privilège pour les ressources AWS.
-
-Aucune clé, aucun mot de passe ou secret ne doit être commité dans Git.
-
----
-
-## Documentation
-
-La documentation fonctionnelle et technique sera progressivement centralisée dans :
-
-```text
-/docs
-```
-
-Elle pourra notamment contenir :
-
-```text
-docs/
-├── requirements/
-├── architecture/
-├── api/
-└── decisions/
-```
-
----
-
-## Statut
-
-Projet en phase initiale de conception et de développement.
-
-Le périmètre fonctionnel est susceptible d'évoluer selon les retours issus des premiers cas d'utilisation.
+L'environnement proposé est destiné au développement. Il utilise
+`ddl-auto=update`, n'a pas encore de migrations versionnées, de renouvellement
+ou révocation immédiate des JWT, ni de limitation des tentatives de connexion.
+Ces sujets et HTTPS sont à traiter avant une ouverture publique.

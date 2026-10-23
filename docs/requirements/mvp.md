@@ -134,7 +134,7 @@ Backend :
 - Spring Security
 
 Base de données :
-- PostgreSQL
+- MySQL (choix actuel ; remplace l'intention initiale PostgreSQL)
 
 Architecture :
 - Monolithe modulaire

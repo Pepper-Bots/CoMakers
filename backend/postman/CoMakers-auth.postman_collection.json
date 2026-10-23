@@ -1,13 +1,13 @@
 {
   "info": {
-    "name": "CoMakers — Connexion",
+    "name": "CoMakers — Authentification et onboarding",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Compte de test existant requis. Renseigner email/password localement. Ne pas partager accessToken."
+    "description": "Parcours depuis une base vide. Configurer baseUrl (8081 Docker ou 8080 IDE). Les variables email/password sont générées par la requête 0 ; garder ces valeurs et accessToken privés."
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080"
+      "value": "http://localhost:8081"
     },
     {
       "key": "email",
@@ -23,6 +23,54 @@
     }
   ],
   "item": [
+    {
+      "name": "0 — Inscription (nouveau compte)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id = pm.variables.replaceIn(\"{{$guid}}\");",
+              "pm.collectionVariables.set(\"email\", `onboarding-${id}@example.com`);",
+              "pm.collectionVariables.set(\"password\", `Local-${id}!`);",
+              "pm.collectionVariables.unset(\"accessToken\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Statut 201\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"displayName\": \"Onboarding test\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/users/register"
+      }
+    },
     {
       "name": "1 — Connexion",
       "event": [
@@ -82,7 +130,8 @@
             "type": "text/javascript",
             "exec": [
               "pm.test(\"Profil accessible\", () => pm.response.to.have.status(200));",
-              "if (pm.response.code === 200) pm.test(\"Pas de mot de passe dans la réponse\", () => { const body = pm.response.json(); pm.expect(body).not.to.have.property(\"passwordHash\"); pm.expect(body).not.to.have.property(\"password\"); });"
+              "if (pm.response.code === 200) pm.test(\"Pas de mot de passe dans la réponse\", () => { const body = pm.response.json(); pm.expect(body).not.to.have.property(\"passwordHash\"); pm.expect(body).not.to.have.property(\"password\"); });",
+              "if (pm.response.code === 200) pm.test(\"Identité attendue\", () => pm.expect(pm.response.json().email).to.eql(pm.collectionVariables.get(\"email\")));"
             ]
           }
         }
@@ -157,6 +206,78 @@
           }
         },
         "url": "{{baseUrl}}/api/auth/login"
+      }
+    },
+    {
+      "name": "5 — Email déjà utilisé",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Statut 409\", () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"displayName\": \"Onboarding test\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/users/register"
+      }
+    },
+    {
+      "name": "6 — Inscription invalide",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Statut 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"displayName\": \"Test\",\n  \"email\": \"invalid\",\n  \"password\": \"abc\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/users/register"
       }
     }
   ]

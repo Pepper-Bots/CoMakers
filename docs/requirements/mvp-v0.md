@@ -1,148 +1,49 @@
-Créer un compte
-↓
-Se connecter
-↓
-Créer un projet
-↓
-Inviter un collaborateur
-↓
-Ajouter des contributions
-↓
-Commenter les contributions
-↓
-Créer / attribuer des tâches
-↓
-Suivre l'avancement du projet
+# MVP V0 — ordre de réalisation et état
 
+## Vision et premier jalon
 
-CoMakers
-│
-├── backend
-│   └── Spring Boot
-│       ├── auth
-│       ├── user
-│       ├── project
-│       ├── membership
-│       ├── contribution
-│       ├── comment
-│       └── task
-│
-└── frontend
-└── à choisir
+Le MVP complet permet une collaboration sur un livre pour enfants.
+Le premier jalon V0 est plus court : inscription -> connexion -> création
+d'un projet privé -> consultation de ce projet par son créateur.
 
+## État au 23 octobre 2026
 
-User
-Project
-ProjectMember
-Invitation
-Contribution
-Comment
-Task
-
-SPRINT 1
-
-Inscription
-↓
-Connexion
-↓
-Création d'un projet
-↓
-Affichage du projet
-
-## Périmètre MVP 
-
-| Priorité | Fonctionnalité | Use case |
+| Fonctionnalité | Cas d'usage | État |
 |---|---|---|
-| 1 | Créer un compte | UC-01 |
-| 2 | Se connecter | UC-02 |
-| 3 | Créer un projet | UC-03 |
-| 4 | Consulter un projet | UC-04 |
-| 5 | Modifier un projet | UC-05 |
-| 6 | Inviter un collaborateur | UC-07 |
-| 7 | Accepter une invitation | UC-08 |
-| 8 | Consulter les membres | UC-10 |
-| 9 | Ajouter une contribution | UC-11 |
-| 10 | Modifier sa contribution | UC-12 |
-| 11 | Consulter les contributions | UC-13 |
-| 12 | Commenter une contribution | UC-14 |
-| 13 | Créer et gérer une tâche | UC-15 + UC associés |
+| Inscription | UC-01 | API et tests réalisés ; validation MySQL/Postman faite |
+| Connexion | UC-02 | API JWT et tests réalisés ; validation MySQL/Postman faite |
+| Profil courant | UC-03 | GET /api/auth/me réalisé |
+| Création d'un projet | UC-05 | À développer |
+| Liste / consultation des projets | UC-06 / UC-07 | À développer |
+| Modification d'un projet | UC-08 | Prévue après le premier jalon |
+| Invitation / acceptation | UC-10 / UC-12 | À développer |
+| Membres | UC-14 | À développer |
+| Contributions | UC-17 à UC-20 | À développer |
+| Commentaires | UC-22 / UC-23 | À développer |
+| Tâches | UC-26 à UC-30 | À développer |
+| Fichiers | UC-32 à UC-35 | MVP complet ; pas dans le premier jalon V0 |
+| Interface utilisateur | Sans endpoint dédié | Absente ; technologie à confirmer |
 
+Les identifiants sont ceux du [catalogue des cas d'usage](use-cases.md).
+Le [périmètre MVP complet](mvp.md) reste la cible produit. Ce tableau ne prouve
+pas l'achèvement d'une issue GitHub : comparer avec son contenu et ses critères.
 
-## Backlog de développement
+## Prochain lot : projets
 
-LOT 0 — Socle
-Spring Boot démarre
-BDD connectée
-Architecture packages
-Configuration dev
+Créer un projet depuis un compte connecté ; nom obligatoire, description
+facultative ; statut ACTIVE ; projet privé ; créateur OWNER et membre automatique.
+Consulter seulement les projets autorisés. S'appuyer sur UC-05/UC-07 et les règles
+BR-004 à BR-010. Définir les limites de longueur et critères précis dans l'issue
+avant de coder.
 
-LOT 1 — Utilisateurs
-User
-Inscription
-Connexion
-JWT
-Sécurisation API
+## Suite envisagée
 
-LOT 2 — Projets
-Project
-Créer
-Consulter
-Modifier
+Collaboration -> contributions -> commentaires -> tâches -> fichiers ->
+interface -> test réel du livre pour enfants. L'ordre fin est à confirmer
+ensemble selon les retours du premier usage.
 
-LOT 3 — Collaboration
-ProjectMember
-Invitation
-Accepter invitation
-Lister membres
+## Décisions encore ouvertes
 
-LOT 4 — Contributions
-Contribution
-Créer
-Modifier
-Lister
-
-LOT 5 — Commentaires
-Comment
-Ajouter
-Consulter
-
-LOT 6 — Tâches
-Task
-Créer
-Attribuer
-Changer statut
-Lister
-
-LOT 7 — Front MVP
-Inscription / connexion
-Dashboard
-Projet
-Contributions
-Tâches
-
-LOT 8 — Test réel
-Création du projet "Livre pour enfants"
-Invitation de ta sœur
-Utilisation réelle
-Bugs
-Améliorations
-
-
-CoMakers/
-├── backend/
-│   ├── pom.xml
-│   └── src/
-│       └── main/
-│           ├── java/
-│           │   └── io/
-│           │       └── github/
-│           │           └── pepperbots/
-│           │               └── comakers/
-│           │                   └── CoMakersApplication.java
-│           │
-│           └── resources/
-│               └── application.properties
-│
-├── docs/
-├── .gitignore
-└── README.md
+Frontend (Angular envisagé), règles détaillées des contributions/tâches/fichiers,
+migrations SQL, déploiement. L'hébergement AWS est une intention future, pas un
+prérequis local. La base retenue aujourd'hui est MySQL.

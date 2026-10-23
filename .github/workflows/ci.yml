@@ -1,0 +1,43 @@
+name: Backend checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Verify (Linux)
+        if: runner.os != 'Windows'
+        run: ./mvnw -B -ntp verify
+      - name: Verify (Windows)
+        if: runner.os == 'Windows'
+        run: .\mvnw.cmd -B -ntp verify
+  local-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate isolated local credentials
+        run: sh scripts/init-env.sh
+      - name: Build and start MySQL and API
+        run: docker compose up -d --build --wait --wait-timeout 240
+      - name: Verify real registration, login and profile
+        shell: pwsh
+        run: ./scripts/smoke-test.ps1 -BaseUrl http://localhost:8081
+      - name: Stop test stack
+        if: always()
+        run: docker compose down
