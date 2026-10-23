@@ -1,11 +1,10 @@
 
----
-
-### `docs/requirements/business-rules.md`
-
-Pour celui-ci, les identifiants `BR-xxx` vont devenir utiles ensuite : dans tes use cases et même dans tes tests, tu pourras faire référence à `BR-012` au lieu de recopier la règle partout.
-
 # CoMakers — Règles métier
+
+Règles cibles du MVP : seules celles liées aux comptes sont actuellement
+implémentées. La numérotation historique est conservée ; les numéros absents ne
+désignent pas des règles déjà écrites. Compléter les règles des contributions,
+commentaires, tâches et fichiers avant leur implémentation.
 
 ## 1. Objet
 
@@ -173,6 +172,12 @@ Un utilisateur ne peut être membre qu'une seule fois d'un même projet.
 Le couple suivant doit être unique :
 
 project + user
+
+## BR-017 — Invitation d'un membre existant
+
+Un utilisateur déjà membre d'un projet ne peut pas être invité à nouveau
+dans ce projet. Une seconde invitation PENDING pour le même couple est refusée.
+Cette règle explicite les préconditions déjà présentes dans UC-10.
 
 ## BR-049 — Informations nécessaires à l'inscription
 
